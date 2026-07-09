@@ -3,7 +3,6 @@
 
 use ch32_hal::Peri;
 use ch32_hal::gpio::{AnyPin, Level, Output};
-use ch32_hal::println;
 use embassy_executor::Spawner;
 use embassy_time::Timer;
 use panic_halt as _;
@@ -25,10 +24,11 @@ async fn main(spawner: Spawner) -> ! {
     ch32_hal::debug::SDIPrint::enable();
     let p = ch32_hal::init(ch32_hal::Config::default());
 
-    // Adjust the LED GPIO according to your board
-    spawner.spawn(blink(p.PA0.into(), 1000).unwrap());
+    spawner.spawn(blink(p.PB1.into(), 1000).unwrap());
     loop {
         Timer::after_millis(1000).await;
-        println!("tick");
+
+        // TODO: the println macro blocks with no debugger connected, figure out a better way.
+        // ch32_hal::println!("tick");
     }
 }
