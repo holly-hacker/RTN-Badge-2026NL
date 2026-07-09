@@ -1,0 +1,41 @@
+[package]
+name = "rtn-badge-2026-nl"
+version = "0.1.0"
+authors = ["Variant9"]
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+[[bin]]
+name = "rtn-badge-2026-nl"
+harness = false # do not use the built in cargo test harness -> resolve rust-analyzer errors
+
+[dependencies]
+ch32-hal = { git = "https://github.com/ch32-rs/ch32-hal.git", features = [
+    "ch32v203f6p6",
+    "embassy",
+    "time-driver-tim2",
+    "rt",
+    "memory-x",
+] }
+embassy-executor = { version = "0.10.0", features = [
+    "platform-spin",
+    "executor-thread"
+] }
+embassy-time = { version = "0.5.1" }
+qingke-rt = "0.7"
+qingke = "0.7"
+embedded-hal = "1.0.0"
+panic-halt = "1.0.0"
+
+[profile.dev]
+opt-level = 's'
+
+[profile.release]
+strip = false     # symbols are not flashed to the microcontroller, so don't strip them.
+codegen-units = 1 # LLVM can perform better optimizations using a single thread
+debug = 2
+debug-assertions = false
+incremental = false
+lto = 'fat'
+opt-level = 's'
+overflow-checks = false
