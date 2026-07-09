@@ -1,13 +1,12 @@
 #![no_std]
 #![no_main]
 
-use embassy_executor::Spawner;
-use embassy_time::Timer;
+use ch32_hal::Peri;
 use ch32_hal::gpio::{AnyPin, Level, Output};
 use ch32_hal::println;
-use ch32_hal::Peri;
+use embassy_executor::Spawner;
+use embassy_time::Timer;
 use panic_halt as _;
-
 
 #[embassy_executor::task]
 async fn blink(pin: Peri<'static, AnyPin>, interval_ms: u64) {
@@ -20,7 +19,6 @@ async fn blink(pin: Peri<'static, AnyPin>, interval_ms: u64) {
         Timer::after_millis(interval_ms).await;
     }
 }
-
 
 #[embassy_executor::main(entry = "ch32_hal::entry")]
 async fn main(spawner: Spawner) -> ! {
