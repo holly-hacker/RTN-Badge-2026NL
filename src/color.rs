@@ -13,12 +13,24 @@ impl Color {
     pub const fn get_components(&self) -> [u8; 3] {
         [self.g, self.r, self.b]
     }
+
+    pub const fn from_bool(value: bool) -> Color {
+        if value { Color::WHITE_HALF } else { Color::OFF }
+    }
+
+    pub const fn from_bool_dim(value: bool) -> Color {
+        if value {
+            Color::WHITE_SIXTEENTH
+        } else {
+            Color::OFF
+        }
+    }
 }
 
 // color constants
 impl Color {
     #[allow(unused)]
-    pub const BLACK: Color = Color::new(0, 0, 0);
+    pub const OFF: Color = Color::new(0, 0, 0);
     #[allow(unused)]
     pub const WHITE: Color = Color::new(255, 255, 255);
 
@@ -30,14 +42,4 @@ impl Color {
     pub const WHITE_EIGHT: Color = Color::new(31, 31, 31);
     #[allow(unused)]
     pub const WHITE_SIXTEENTH: Color = Color::new(15, 15, 15);
-}
-
-impl From<bool> for Color {
-    fn from(value: bool) -> Self {
-        if value {
-            Self::WHITE_SIXTEENTH
-        } else {
-            Self::BLACK
-        }
-    }
 }
