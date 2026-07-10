@@ -56,10 +56,9 @@ async fn main(spawner: Spawner) -> ! {
     let mut effect_index = 0;
     let mut effect = crate::effects::ALL_EFFECTS[effect_index]; // hardcoded for now
     let mut start = Instant::now();
-    let mut frame = 0;
     loop {
         let time = Instant::now() - start;
-        effect(time, frame, &mut color_buffer);
+        effect(time, &mut color_buffer);
 
         let reset_timer = leds.set_colors(&color_buffer).await;
 
@@ -69,12 +68,9 @@ async fn main(spawner: Spawner) -> ! {
 
             effect = crate::effects::ALL_EFFECTS[effect_index]; // hardcoded for now
             start = Instant::now();
-            frame = 0;
         }
 
         // NOTE: could generate the next frame while waiting on this to increase framerate
         reset_timer.await;
-
-        frame += 1;
     }
 }
