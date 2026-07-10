@@ -1,15 +1,21 @@
 #![no_std]
 #![no_main]
 
-mod ws2812b;
+mod color;
+mod effects;
+mod hardware;
 
 use ch32_hal::Peri;
 use ch32_hal::gpio::{AnyPin, Level, Output};
 use embassy_executor::Spawner;
-use embassy_time::Timer;
+use embassy_time::{Instant, Timer};
 use panic_halt as _;
 
-use crate::ws2812b::Ws2812b;
+use crate::color::Color;
+use crate::hardware::Ws2812b;
+
+/// The amount of LEDs on the board
+pub const COLOR_COUNT: usize = 8 * 8;
 
 #[embassy_executor::task]
 async fn blink(pin: Peri<'static, AnyPin>, interval_ms: u64) {
@@ -33,32 +39,29 @@ async fn main(spawner: Spawner) -> ! {
 
     spawner.spawn(blink(p.PB1.into(), 1000).unwrap());
 
-    let mut leds = ws2812b::Ws2812b::new(p.SPI1, p.PA7, p.DMA1_CH3).await;
+    let mut leds = Ws2812b::new(p.SPI1, p.PA7, p.DMA1_CH3).await;
 
-    let mut color_buffer = [ws2812b::Color::BLACK; 64];
+    let mut color_buffer = [Color::BLACK; COLOR_COUNT];
 
     // hot restarts don't clear the LED data, so explicitly clear them here
     let reset_timer = leds.set_colors(&color_buffer).await;
     reset_timer.await;
 
-    // give user a bit of time to restart int bootloader mode without having LEDs on
+    // give user a bit of time to restart into bootloader mode without having LEDs on
     Timer::after_millis(500).await;
 
-    let mut prev_idx = 0;
-    let mut cur_idx = 0;
+    let effect = crate::effects::ALL_EFFECTS[1]; // hardcoded for now
+    let start = Instant::now();
+    let mut frame = 0;
     loop {
-        color_buffer[prev_idx] = ws2812b::Color::BLACK;
-        color_buffer[cur_idx] = ws2812b::Color::WHITE;
+        let time = Instant::now() - start;
+        effect(time, frame, &mut color_buffer);
 
         let reset_timer = leds.set_colors(&color_buffer).await;
-        let interval_timer = Timer::after_millis(50);
 
-        // both timers have started, so we're waiting in parallel
+        // NOTE: could generate the next frame while waiting on this to increase framerate
         reset_timer.await;
-        interval_timer.await;
 
-        prev_idx = cur_idx;
-        cur_idx += 1;
-        cur_idx %= Ws2812b::COLOR_COUNT;
+        frame += 1;
     }
 }
