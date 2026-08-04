@@ -2,6 +2,14 @@
 
 The firmware for the 2026 RTN Badge (NL edition).
 
+## Hardware
+
+The standard version of this badge is built using a CH32V203F6P6 MCU. This is a 32-bit RISC-V chip (`riscv32imc`) with 32kb of flash and 10kb of RAM. It's connected to an 8x8 RGB LED matrix (using WS2812b-2020 LEDs) and has a USB-shaped edge connector allowing it to be inserted into a laptop or desktop PC.
+
+As the CH32V203 family of MCUs contains an USB peripheral, so it can also serve as an arbitrary USB-2 device.
+
+The full schematic and PCB design files can be found [in the PCB repository](https://github.com/holly-hacker/RTN-Badge-2026NL-PCB).
+
 ### Build
 
 ```bash
