@@ -1,3 +1,4 @@
+mod greetings;
 mod rick;
 mod rtn_logo;
 
@@ -9,8 +10,13 @@ use crate::{PIXEL_COUNT, color::Color, utils::math::fast_cos};
 
 pub type Effect = fn(time: Duration, buf: &mut [Color; PIXEL_COUNT]);
 
-pub const ALL_EFFECTS: [Effect; 5] = [
+// TODO:
+// - Game of Life
+// - stacked perlin noise
+// - stars
+pub const ALL_EFFECTS: [Effect; 6] = [
     (rtn_logo::rtn_logo),
+    (greetings::greetings),
     gradient,
     pixel_run,
     pixel_counter,

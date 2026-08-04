@@ -44,6 +44,8 @@ pub fn rtn_logo(time: Duration, buf: &mut [Color; PIXEL_COUNT]) {
         (0, (0, 0))
     };
 
+    // TODO: try out interpolation for smoother animations
+
     // shift y
     let letter = shl_signed_u64(letter, shift.1 * 8);
 

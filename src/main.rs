@@ -15,8 +15,11 @@ use panic_halt as _;
 use crate::color::Color;
 use crate::hardware::{Button, Ws2812b};
 
+pub const PIXEL_WIDTH: usize = 8;
+pub const PIXEL_HEIGHT: usize = 8;
+
 /// The amount of LEDs on the board
-pub const PIXEL_COUNT: usize = 8 * 8;
+pub const PIXEL_COUNT: usize = PIXEL_WIDTH * PIXEL_HEIGHT;
 
 #[embassy_executor::task]
 async fn blink(pin: Peri<'static, AnyPin>, interval_ms: u64) {
@@ -64,6 +67,7 @@ async fn main(spawner: Spawner) -> ! {
         let time = Instant::now() - start;
         effect(time, &mut color_buffer);
 
+        // TODO: don't set colors if they didn't change from last frame
         let reset_timer = leds.set_colors(&color_buffer, !use_full_color_range).await;
 
         if button1.poll().is_press() {
