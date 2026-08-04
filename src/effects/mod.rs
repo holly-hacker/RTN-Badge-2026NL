@@ -1,3 +1,5 @@
+mod rick;
+
 use embassy_time::Duration;
 use fixed::types::{I16F16, I48F16};
 use fixed_macro::types::I16F16;
@@ -6,7 +8,7 @@ use crate::{PIXEL_COUNT, color::Color, utils::math::fast_cos};
 
 pub type Effect = fn(time: Duration, buf: &mut [Color; PIXEL_COUNT]);
 
-pub const ALL_EFFECTS: [Effect; 4] = [rtn_logo, gradient, pixel_run, pixel_counter];
+pub const ALL_EFFECTS: [Effect; 5] = [rtn_logo, gradient, pixel_run, pixel_counter, (rick::rick)];
 
 fn pixel_run(time: Duration, buf: &mut [Color; PIXEL_COUNT]) {
     let index = (time.as_millis() / 64) as usize % PIXEL_COUNT;
