@@ -2,5 +2,5 @@
 target = "riscv32imc-unknown-none-elf"
 
 [target."riscv32imc-unknown-none-elf"]
-# runner = "wlink -v flash --enable-sdi-print --watch-serial"
-runner = "wchisp --usb flash"
+runner = "wchisp --usb flash" # flash over USB bootloader
+# runner = "wlink flash --enable-sdi-print --watch-serial" # flash over debug pins

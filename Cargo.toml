@@ -26,9 +26,15 @@ qingke-rt = "0.7"
 qingke = "0.7"
 embedded-hal = "1.0.0"
 panic-halt = "1.0.0"
+fixed = "1.31.0"
+fixed-macro = "1.2.0"
 
 [profile.dev]
 opt-level = 's'
+
+[profile.dev.package]
+# fixed's debug assertions massively bloat binary size, adding up to 11kb
+fixed = { debug-assertions = false }
 
 [profile.release]
 strip = false     # symbols are not flashed to the microcontroller, so don't strip them.
