@@ -2,25 +2,25 @@ use embassy_time::Duration;
 use fixed::types::{I16F16, I48F16};
 use fixed_macro::types::I16F16;
 
-use crate::{COLOR_COUNT, color::Color, utils::math::fast_cos};
+use crate::{PIXEL_COUNT, color::Color, utils::math::fast_cos};
 
-pub type Effect = fn(time: Duration, buf: &mut [Color; COLOR_COUNT]);
+pub type Effect = fn(time: Duration, buf: &mut [Color; PIXEL_COUNT]);
 
 pub const ALL_EFFECTS: [Effect; 4] = [rtn_logo, gradient, pixel_run, pixel_counter];
 
-fn pixel_run(time: Duration, buf: &mut [Color; COLOR_COUNT]) {
-    let index = (time.as_millis() / 64) as usize % COLOR_COUNT;
+fn pixel_run(time: Duration, buf: &mut [Color; PIXEL_COUNT]) {
+    let index = (time.as_millis() / 64) as usize % PIXEL_COUNT;
     let mask = 1 << index;
     set_colors_to_bitmask(buf, mask);
 }
 
-fn pixel_counter(time: Duration, buf: &mut [Color; COLOR_COUNT]) {
+fn pixel_counter(time: Duration, buf: &mut [Color; PIXEL_COUNT]) {
     let elapsed_ms = time.as_millis();
     set_colors_to_bitmask(buf, elapsed_ms);
 }
 
 /// A scrolling gradient. Based on the default shader on shadertoy.
-fn gradient(time: Duration, buf: &mut [Color; COLOR_COUNT]) {
+fn gradient(time: Duration, buf: &mut [Color; PIXEL_COUNT]) {
     let time = time.as_millis() as u32;
     let time = time * 2; // double speed
     let time = I48F16::from_num(time) / 1000; // NOTE: no 64bit hardware
@@ -45,7 +45,7 @@ fn gradient(time: Duration, buf: &mut [Color; COLOR_COUNT]) {
 }
 
 /// An animation showing the letters `R`, `T` and `N` in sequence
-fn rtn_logo(time: Duration, buf: &mut [Color; COLOR_COUNT]) {
+fn rtn_logo(time: Duration, buf: &mut [Color; PIXEL_COUNT]) {
     const LETTER_R: u64 = 0b11111100_11111110_11001110_11001110_11111100_11111100_11001110_11000110;
     const LETTER_T: u64 = 0b11111111_11111111_00011000_00011000_00011000_00011000_00011000_00011000;
     const LETTER_N: u64 = 0b11110011_11110011_11111011_11111011_11011111_11001111_11001111_11000111;
@@ -104,7 +104,7 @@ fn rtn_logo(time: Duration, buf: &mut [Color; COLOR_COUNT]) {
     }
 }
 
-fn set_colors_to_bitmask(buf: &mut [Color; COLOR_COUNT], bitmask: u64) {
+fn set_colors_to_bitmask(buf: &mut [Color; PIXEL_COUNT], bitmask: u64) {
     for (i, item) in buf.iter_mut().enumerate() {
         let is_set = (bitmask & 1 << i) > 0;
         *item = Color::from_bool(is_set);

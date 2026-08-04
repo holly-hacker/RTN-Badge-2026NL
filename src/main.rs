@@ -16,7 +16,7 @@ use crate::color::Color;
 use crate::hardware::{Button, Ws2812b};
 
 /// The amount of LEDs on the board
-pub const COLOR_COUNT: usize = 8 * 8;
+pub const PIXEL_COUNT: usize = 8 * 8;
 
 #[embassy_executor::task]
 async fn blink(pin: Peri<'static, AnyPin>, interval_ms: u64) {
@@ -48,7 +48,7 @@ async fn main(spawner: Spawner) -> ! {
     // when booted while holding PA6: use full brightnes instead of automatic dim
     let use_full_color_range = button2.poll().is_down();
 
-    let mut color_buffer = [Color::OFF; COLOR_COUNT];
+    let mut color_buffer = [Color::OFF; PIXEL_COUNT];
 
     // hot restarts don't clear the LED data, so explicitly clear them here
     let reset_timer = leds.set_colors(&color_buffer, !use_full_color_range).await;

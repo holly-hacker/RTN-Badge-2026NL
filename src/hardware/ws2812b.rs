@@ -11,7 +11,7 @@ use ch32_hal::{
 };
 use embassy_time::Timer;
 
-use crate::{COLOR_COUNT, color::Color};
+use crate::{PIXEL_COUNT, color::Color};
 
 /// The SPI frequency, chosen based on the timing requirements of the LEDs on the board.
 ///
@@ -57,13 +57,13 @@ impl Ws2812b {
 
     pub async fn set_colors(
         &mut self,
-        colors: &[Color; COLOR_COUNT],
+        colors: &[Color; PIXEL_COUNT],
         dim_colors: bool,
     ) -> embassy_time::Timer {
         // Each color requires 24 codes (8 per channel) and each code requires 4 transfers, meaning
         // 12 bytes per color. For an 8x8 matrix, this means a 768 byte DMA buffer.
         // TODO: this probably does not belong on the stack
-        let mut dma_buffer = [const { MaybeUninit::<u8>::uninit() }; COLOR_COUNT * 3 * 4];
+        let mut dma_buffer = [const { MaybeUninit::<u8>::uninit() }; PIXEL_COUNT * 3 * 4];
 
         for (color_i, color) in colors.iter().enumerate() {
             let color_start = color_i * 3 * 4;
@@ -87,7 +87,7 @@ impl Ws2812b {
 
         // SAFETY: just initialized each byte
         // TODO: use MaybeUninit::transpose once it stabilizes, see rust-lang/rust#96097
-        let dma_buffer: [u8; COLOR_COUNT * 3 * 4] = unsafe { transmute(dma_buffer) };
+        let dma_buffer: [u8; PIXEL_COUNT * 3 * 4] = unsafe { transmute(dma_buffer) };
 
         // NOTE: implementation returns no errors
         _ = self.spi.write(&dma_buffer).await;
