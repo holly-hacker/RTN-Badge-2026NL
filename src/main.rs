@@ -32,6 +32,7 @@ async fn blink(pin: Peri<'static, AnyPin>, interval_ms: u64) {
 
 #[embassy_executor::main(entry = "ch32_hal::entry")]
 async fn main(spawner: Spawner) -> ! {
+    // init hal, use 144MHz clock with external crystal
     let config = ch32_hal::Config {
         rcc: ch32_hal::rcc::Config::SYSCLK_FREQ_144MHZ_HSE,
         ..Default::default()
@@ -42,12 +43,15 @@ async fn main(spawner: Spawner) -> ! {
 
     let mut leds = Ws2812b::new(p.SPI1, p.PA7, p.DMA1_CH3).await;
     let mut button1 = Button::new_pulldown(p.PA5.into());
-    let _button2 = Button::new_pulldown(p.PA6.into());
+    let mut button2 = Button::new_pulldown(p.PA6.into());
+
+    // when booted while holding PA6: use full brightnes instead of automatic dim
+    let use_full_color_range = button2.poll().is_down();
 
     let mut color_buffer = [Color::OFF; COLOR_COUNT];
 
     // hot restarts don't clear the LED data, so explicitly clear them here
-    let reset_timer = leds.set_colors(&color_buffer).await;
+    let reset_timer = leds.set_colors(&color_buffer, !use_full_color_range).await;
     reset_timer.await;
 
     // give user a bit of time to restart into bootloader mode without having LEDs on
@@ -60,7 +64,7 @@ async fn main(spawner: Spawner) -> ! {
         let time = Instant::now() - start;
         effect(time, &mut color_buffer);
 
-        let reset_timer = leds.set_colors(&color_buffer).await;
+        let reset_timer = leds.set_colors(&color_buffer, !use_full_color_range).await;
 
         if button1.poll().is_press() {
             effect_index += 1;

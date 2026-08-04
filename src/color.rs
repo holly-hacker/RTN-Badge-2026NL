@@ -19,11 +19,7 @@ impl Color {
     }
 
     pub const fn from_bool(value: bool) -> Color {
-        if value {
-            Color::WHITE_SIXTEENTH
-        } else {
-            Color::OFF
-        }
+        if value { Color::WHITE } else { Color::OFF }
     }
 }
 
@@ -33,13 +29,4 @@ impl Color {
     pub const OFF: Color = Color::new_w(0);
     #[allow(unused)]
     pub const WHITE: Color = Color::new_w(255);
-
-    #[allow(unused)]
-    pub const WHITE_HALF: Color = Color::new_w(127);
-    #[allow(unused)]
-    pub const WHITE_QUARTER: Color = Color::new_w(63);
-    #[allow(unused)]
-    pub const WHITE_EIGHT: Color = Color::new_w(31);
-    #[allow(unused)]
-    pub const WHITE_SIXTEENTH: Color = Color::new_w(15);
 }

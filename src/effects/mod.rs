@@ -23,7 +23,7 @@ fn pixel_counter(time: Duration, buf: &mut [Color; COLOR_COUNT]) {
 fn gradient(time: Duration, buf: &mut [Color; COLOR_COUNT]) {
     let time = time.as_millis() as u32;
     let time = time * 2; // double speed
-    let time = I48F16::from_num(time) / 1000;
+    let time = I48F16::from_num(time) / 1000; // NOTE: no 64bit hardware
     let time = I16F16::from_num(time);
     let time = time % (I16F16::PI * 2);
 
@@ -36,9 +36,9 @@ fn gradient(time: Duration, buf: &mut [Color; COLOR_COUNT]) {
         let g = I16F16!(0.5) + I16F16!(0.5) * fast_cos(time + y + I16F16!(2));
         let b = I16F16!(0.5) + I16F16!(0.5) * fast_cos(time + x + I16F16!(4));
 
-        let r: u8 = (r * 31).to_num();
-        let g: u8 = (g * 31).to_num();
-        let b: u8 = (b * 31).to_num();
+        let r: u8 = (r * 255).to_num();
+        let g: u8 = (g * 255).to_num();
+        let b: u8 = (b * 255).to_num();
 
         *item = Color::new(r, g, b);
     }
@@ -60,16 +60,15 @@ fn rtn_logo(time: Duration, buf: &mut [Color; COLOR_COUNT]) {
     const ANIMATION_SOLID: u32 = 1500;
     const ANIMATION_SLIDE: u32 = 2000;
     const ANIMATION_END: u32 = 2500;
-    const MAX_BRIGHT: u8 = 32; // out of 255
 
     let letter_idx = (time.as_millis() / ANIMATION_END as u64) as usize % MASKS.len();
     let letter = MASKS[letter_idx];
     let phase = (time.as_millis() % ANIMATION_END as u64) as u32;
 
     let (brightness, shift): (u8, (i32, i32)) = if phase < ANIMATION_FADE {
-        ((phase * (MAX_BRIGHT as u32) / ANIMATION_FADE) as u8, (0, 0))
+        ((phase * 255 / ANIMATION_FADE) as u8, (0, 0))
     } else if phase < ANIMATION_SOLID {
-        (MAX_BRIGHT, (0, 0))
+        (255, (0, 0))
     } else if phase < ANIMATION_SLIDE {
         let time_in_phase = phase - ANIMATION_SOLID;
         let slide_phase = time_in_phase * 8 / (ANIMATION_SLIDE - ANIMATION_SOLID);
@@ -82,7 +81,7 @@ fn rtn_logo(time: Duration, buf: &mut [Color; COLOR_COUNT]) {
             1 => slide_phase as i32,
             _ => 0,
         };
-        (MAX_BRIGHT, (slide_x, slide_y))
+        (255, (slide_x, slide_y))
     } else {
         (0, (0, 0))
     };

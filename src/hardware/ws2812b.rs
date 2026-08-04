@@ -55,7 +55,11 @@ impl Ws2812b {
         Self { spi }
     }
 
-    pub async fn set_colors(&mut self, colors: &[Color; COLOR_COUNT]) -> embassy_time::Timer {
+    pub async fn set_colors(
+        &mut self,
+        colors: &[Color; COLOR_COUNT],
+        dim_colors: bool,
+    ) -> embassy_time::Timer {
         // Each color requires 24 codes (8 per channel) and each code requires 4 transfers, meaning
         // 12 bytes per color. For an 8x8 matrix, this means a 768 byte DMA buffer.
         // TODO: this probably does not belong on the stack
@@ -64,7 +68,13 @@ impl Ws2812b {
         for (color_i, color) in colors.iter().enumerate() {
             let color_start = color_i * 3 * 4;
 
-            for (component_i, component) in color.get_components().into_iter().enumerate() {
+            for (component_i, mut component) in color.get_components().into_iter().enumerate() {
+                if dim_colors {
+                    // divide color value by 8, which brings the brightness to a level you can
+                    // actually look at without burning your eyes
+                    component >>= 3;
+                }
+
                 let component_start = color_start + component_i * 4;
 
                 #[allow(clippy::identity_op)]
