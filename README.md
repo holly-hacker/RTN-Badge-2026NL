@@ -21,7 +21,7 @@ cargo build --release
 [wlink](https://github.com/ch32-rs/wlink) needs to be installed:
 
 ```bash
-cargo install --git https://github.com/ch32-rs/wchisp
+cargo +stable install --git https://github.com/ch32-rs/wchisp
 ```
 
 On linux, you may need to set up udev rules or add your user to a group to access USB devices. Do not run cargo as root!
